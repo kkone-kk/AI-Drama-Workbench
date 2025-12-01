@@ -1,19 +1,23 @@
 import React from 'react';
 import { LayoutDashboard, Users, Clapperboard, Video, BarChart2, CheckCircle2 } from 'lucide-react';
+import { translations, Language } from '../translations';
 
 interface SidebarProps {
   currentStep: number;
   setStep: (step: number) => void;
+  language: Language;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ currentStep, setStep }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ currentStep, setStep, language }) => {
+  const t = translations[language];
+
   const steps = [
-    { id: 0, label: 'Setup', icon: Users },
-    { id: 1, label: 'Strategy', icon: BarChart2 },
-    { id: 2, label: 'Scenes', icon: LayoutDashboard },
-    { id: 3, label: 'Production', icon: Clapperboard },
-    { id: 4, label: 'Viral Check', icon: CheckCircle2 },
-    { id: 5, label: 'Final Script', icon: Video },
+    { id: 0, label: t.sidebar.setup, icon: Users },
+    { id: 1, label: t.sidebar.strategy, icon: BarChart2 },
+    { id: 2, label: t.sidebar.scenes, icon: LayoutDashboard },
+    { id: 3, label: t.sidebar.production, icon: Clapperboard },
+    { id: 4, label: t.sidebar.viralCheck, icon: CheckCircle2 },
+    { id: 5, label: t.sidebar.finalScript, icon: Video },
   ];
 
   return (
@@ -22,7 +26,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentStep, setStep }) => {
         <h1 className="text-xl font-bold text-white flex items-center gap-2">
           <span className="bg-purple-600 text-white p-1 rounded">AI</span> Drama
         </h1>
-        <p className="text-xs mt-1 text-slate-500">Viral Short Video Workbench</p>
+        <p className="text-xs mt-1 text-slate-500">{t.subtitle}</p>
       </div>
       
       <nav className="flex-1 p-4 space-y-2">

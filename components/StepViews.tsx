@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ProjectSettings, Character, Scene, DialogueLine, ViralAnalysis } from '../types';
 import { Plus, Trash2, Edit2, Play, CheckCircle, AlertTriangle, Sparkles, Video, User, BarChart2 } from 'lucide-react';
+import { translations, Language } from '../translations';
 
 // --- Step 0: Setup ---
 export const SetupView: React.FC<{
@@ -9,8 +10,10 @@ export const SetupView: React.FC<{
   characters: Character[];
   setCharacters: (c: Character[]) => void;
   onNext: () => void;
-}> = ({ settings, setSettings, characters, setCharacters, onNext }) => {
+  language: Language;
+}> = ({ settings, setSettings, characters, setCharacters, onNext, language }) => {
   const [newCharName, setNewCharName] = useState('');
+  const t = translations[language];
   
   const addCharacter = () => {
     if (!newCharName) return;
@@ -29,14 +32,14 @@ export const SetupView: React.FC<{
       <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-slate-800">
           <span className="bg-slate-900 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
-          Project Definition
+          {t.setup.title}
         </h2>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Drama Topic / Core Idea</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">{t.setup.topicLabel}</label>
             <textarea
               className="w-full border border-slate-300 rounded-lg p-3 h-24 focus:ring-2 focus:ring-purple-500 outline-none"
-              placeholder="e.g., A time-traveling barista saves a CEO from a coffee spill that causes a stock market crash."
+              placeholder={t.setup.topicPlaceholder}
               value={settings.topic}
               onChange={(e) => setSettings({ ...settings, topic: e.target.value })}
             />
@@ -47,7 +50,7 @@ export const SetupView: React.FC<{
       <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-slate-800">
            <span className="bg-slate-900 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
-           Cast & Profiles
+           {t.setup.castTitle}
         </h2>
         <div className="grid gap-4 mb-4">
           {characters.map((char, idx) => (
@@ -58,12 +61,13 @@ export const SetupView: React.FC<{
                   setCharacters(n);
                 }}
                 className="absolute top-2 right-2 text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                title={t.setup.delete}
               >
                 <Trash2 size={16} />
               </button>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs text-slate-500">Name</label>
+                  <label className="text-xs text-slate-500">{t.setup.name}</label>
                   <input
                     type="text"
                     value={char.name}
@@ -72,25 +76,25 @@ export const SetupView: React.FC<{
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-slate-500">Gender</label>
+                  <label className="text-xs text-slate-500">{t.setup.gender}</label>
                   <select
                     value={char.gender}
                     onChange={(e) => updateCharacter(idx, 'gender', e.target.value as any)}
                     className="w-full bg-transparent border-b border-slate-300 outline-none"
                   >
-                    <option>Male</option>
-                    <option>Female</option>
-                    <option>Other</option>
+                    <option value="Male">{t.setup.male}</option>
+                    <option value="Female">{t.setup.female}</option>
+                    <option value="Other">{t.setup.other}</option>
                   </select>
                 </div>
                 <div className="col-span-2">
-                  <label className="text-xs text-slate-500">Profile / Backstory</label>
+                  <label className="text-xs text-slate-500">{t.setup.profile}</label>
                   <input
                      type="text"
                      value={char.profile}
                      onChange={(e) => updateCharacter(idx, 'profile', e.target.value)}
                      className="w-full bg-transparent border-b border-slate-300 outline-none text-sm"
-                     placeholder="A brief background..."
+                     placeholder={t.setup.profile}
                   />
                 </div>
               </div>
@@ -103,11 +107,11 @@ export const SetupView: React.FC<{
             value={newCharName}
             onChange={(e) => setNewCharName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && addCharacter()}
-            placeholder="New Character Name"
+            placeholder={t.setup.newCharPlaceholder}
             className="flex-1 border border-slate-300 rounded-lg px-3 py-2 outline-none focus:border-purple-500"
           />
           <button onClick={addCharacter} className="bg-slate-900 text-white px-4 py-2 rounded-lg hover:bg-slate-800 flex items-center gap-1">
-            <Plus size={16} /> Add
+            <Plus size={16} /> {t.setup.add}
           </button>
         </div>
       </div>
@@ -118,7 +122,7 @@ export const SetupView: React.FC<{
           disabled={!settings.topic || characters.length === 0}
           className="bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-all shadow-lg shadow-purple-200"
         >
-          Next: Define Strategy <Play size={16} />
+          {t.setup.next} <Play size={16} />
         </button>
       </div>
     </div>
@@ -131,14 +135,17 @@ export const StrategyView: React.FC<{
   isLoading: boolean;
   onGenerate: () => void;
   onNext: () => void;
-}> = ({ settings, isLoading, onGenerate, onNext }) => {
+  language: Language;
+}> = ({ settings, isLoading, onGenerate, onNext, language }) => {
+  const t = translations[language];
+
   return (
     <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
       <div className="bg-gradient-to-r from-purple-900 to-slate-900 p-8 rounded-xl text-white shadow-xl relative overflow-hidden">
         <div className="relative z-10">
-          <h2 className="text-2xl font-bold mb-2">Audience & Style Strategy</h2>
+          <h2 className="text-2xl font-bold mb-2">{t.strategy.title}</h2>
           <p className="text-purple-200 mb-6 max-w-xl">
-            Our AI Strategist will analyze your topic to define the perfect target audience, emotional hooks, and visual style for a viral hit.
+            {t.strategy.desc}
           </p>
           {!settings.targetAudience ? (
             <button
@@ -147,16 +154,16 @@ export const StrategyView: React.FC<{
               className="bg-white text-purple-900 px-6 py-3 rounded-lg font-bold hover:bg-purple-50 flex items-center gap-2 transition-transform active:scale-95"
             >
               {isLoading ? (
-                <span className="animate-pulse">Analyzing Market...</span>
+                <span className="animate-pulse">{t.strategy.analyzing}</span>
               ) : (
                 <>
-                  <Sparkles size={18} /> Generate Strategy
+                  <Sparkles size={18} /> {t.strategy.analyzeBtn}
                 </>
               )}
             </button>
           ) : (
              <div className="flex items-center gap-3 text-green-300">
-               <CheckCircle size={20} /> Strategy Generated
+               <CheckCircle size={20} /> {t.strategy.generated}
              </div>
           )}
         </div>
@@ -165,10 +172,10 @@ export const StrategyView: React.FC<{
 
       {settings.targetAudience && (
         <div className="grid md:grid-cols-2 gap-6 animate-slide-up">
-           <StrategyCard title="Target Audience" value={settings.targetAudience} color="border-l-blue-500" />
-           <StrategyCard title="Emotional Need" value={settings.emotionNeed} color="border-l-pink-500" />
-           <StrategyCard title="Style Template" value={settings.styleTemplate} color="border-l-purple-500" />
-           <StrategyCard title="Core Memory Point" value={settings.memoryPoint} color="border-l-yellow-500" />
+           <StrategyCard title={t.strategy.targetAudience} value={settings.targetAudience} color="border-l-blue-500" />
+           <StrategyCard title={t.strategy.emotionNeed} value={settings.emotionNeed} color="border-l-pink-500" />
+           <StrategyCard title={t.strategy.styleTemplate} value={settings.styleTemplate} color="border-l-purple-500" />
+           <StrategyCard title={t.strategy.memoryPoint} value={settings.memoryPoint} color="border-l-yellow-500" />
         </div>
       )}
 
@@ -178,7 +185,7 @@ export const StrategyView: React.FC<{
             onClick={onNext}
             className="bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 flex items-center gap-2 shadow-lg"
           >
-            Next: Scene Planning <Play size={16} />
+            {t.strategy.next} <Play size={16} />
           </button>
         </div>
       )}
@@ -199,13 +206,16 @@ export const ScenesView: React.FC<{
   isLoading: boolean;
   onGenerate: () => void;
   onNext: () => void;
-}> = ({ scenes, isLoading, onGenerate, onNext }) => {
+  language: Language;
+}> = ({ scenes, isLoading, onGenerate, onNext, language }) => {
+  const t = translations[language];
+
   return (
     <div className="max-w-5xl mx-auto space-y-6 animate-fade-in">
        <div className="flex items-center justify-between">
          <div>
-           <h2 className="text-2xl font-bold text-slate-900">Scene Planning</h2>
-           <p className="text-slate-500 text-sm">Director AI will structure conflict and rhythm.</p>
+           <h2 className="text-2xl font-bold text-slate-900">{t.scenes.title}</h2>
+           <p className="text-slate-500 text-sm">{t.scenes.desc}</p>
          </div>
          {scenes.length === 0 ? (
            <button
@@ -214,10 +224,10 @@ export const ScenesView: React.FC<{
             className="bg-purple-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-purple-700 flex items-center gap-2"
            >
              {isLoading ? <span className="animate-spin">⌛</span> : <Video size={18} />}
-             Generate Scenes
+             {t.scenes.generateBtn}
            </button>
          ) : (
-            <button onClick={onGenerate} className="text-purple-600 text-sm hover:underline">Regenerate</button>
+            <button onClick={onGenerate} className="text-purple-600 text-sm hover:underline">{t.scenes.regenerate}</button>
          )}
        </div>
 
@@ -226,23 +236,23 @@ export const ScenesView: React.FC<{
            <div key={scene.id} className="bg-white border border-slate-200 rounded-lg p-5 hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center gap-3">
-                  <span className="bg-slate-900 text-white text-xs font-bold px-2 py-1 rounded">SCENE {scene.id}</span>
+                  <span className="bg-slate-900 text-white text-xs font-bold px-2 py-1 rounded">{t.scenes.sceneLabel} {scene.id}</span>
                   <span className="font-semibold text-slate-700">{scene.location}</span>
                 </div>
                 <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full border border-purple-200">
-                  {scene.conflict || 'General Interaction'}
+                  {scene.conflict || t.scenes.interaction}
                 </span>
               </div>
-              <p className="text-slate-600 mb-3 text-sm">{scene.description}</p>
+              <p className="text-slate-600 mb-3 text-sm">{scene.description || t.scenes.descPlaceholder}</p>
               
               {/* Placeholder for dialogues if generated later */}
               {scene.dialogues.length > 0 && (
                 <div className="mt-4 pt-4 border-t border-slate-100">
                   <div className="flex items-center gap-2 text-xs text-green-600 mb-2">
-                    <CheckCircle size={12} /> Dialogue & Shots Ready
+                    <CheckCircle size={12} /> {t.scenes.dialoguesReady}
                   </div>
                   <div className="text-xs text-slate-400">
-                    {scene.dialogues.length} lines of dialogue generated.
+                    {scene.dialogues.length} {t.scenes.linesGenerated}
                   </div>
                 </div>
               )}
@@ -256,7 +266,7 @@ export const ScenesView: React.FC<{
               onClick={onNext}
               className="bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 flex items-center gap-2 shadow-lg"
             >
-              Next: Production (Dialogue & Shots) <Play size={16} />
+              {t.scenes.next} <Play size={16} />
             </button>
           </div>
        )}
@@ -268,25 +278,34 @@ export const ScenesView: React.FC<{
 export const ProductionView: React.FC<{
   scenes: Scene[];
   isProcessing: boolean;
-  progress: string;
+  status: { type: 'processing' | 'complete' | 'idle', id?: number };
   onStartProduction: () => void;
   onNext: () => void;
-}> = ({ scenes, isProcessing, progress, onStartProduction, onNext }) => {
+  language: Language;
+}> = ({ scenes, isProcessing, status, onStartProduction, onNext, language }) => {
+  const t = translations[language];
   const allDone = scenes.every(s => s.dialogues.length > 0 && s.dialogues[0].shotType);
+
+  let statusText = '';
+  if (status.type === 'processing' && status.id) {
+    statusText = `${t.production.processing} ${t.scenes.sceneLabel} ${status.id}...`;
+  } else if (status.type === 'complete') {
+    statusText = t.production.complete;
+  }
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 animate-fade-in h-[calc(100vh-140px)] flex flex-col">
        <div className="flex items-center justify-between shrink-0">
          <div>
-           <h2 className="text-2xl font-bold text-slate-900">Production Phase</h2>
-           <p className="text-slate-500 text-sm">Screenwriter & Cinematographer Agents working in tandem.</p>
+           <h2 className="text-2xl font-bold text-slate-900">{t.production.title}</h2>
+           <p className="text-slate-500 text-sm">{t.production.desc}</p>
          </div>
          {!allDone && !isProcessing && (
            <button
             onClick={onStartProduction}
             className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 flex items-center gap-2 shadow-md"
            >
-             <Sparkles size={18} /> Start Production Loop
+             <Sparkles size={18} /> {t.production.startBtn}
            </button>
          )}
        </div>
@@ -294,7 +313,7 @@ export const ProductionView: React.FC<{
        {isProcessing && (
          <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg flex items-center gap-3 shrink-0">
            <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-           <span className="text-blue-800 font-medium">{progress}</span>
+           <span className="text-blue-800 font-medium">{statusText}</span>
          </div>
        )}
 
@@ -302,21 +321,21 @@ export const ProductionView: React.FC<{
           {scenes.map((scene) => (
             <div key={scene.id} className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
               <div className="bg-slate-50 p-3 border-b border-slate-200 flex justify-between items-center sticky top-0 z-10">
-                 <h3 className="font-bold text-slate-700 text-sm">SCENE {scene.id} - {scene.location}</h3>
-                 <span className="text-xs text-slate-400">{scene.dialogues.length > 0 ? 'Completed' : 'Pending'}</span>
+                 <h3 className="font-bold text-slate-700 text-sm">{t.scenes.sceneLabel} {scene.id} - {scene.location}</h3>
+                 <span className="text-xs text-slate-400">{scene.dialogues.length > 0 ? t.production.completed : t.production.pending}</span>
               </div>
               
               {scene.dialogues.length === 0 ? (
                 <div className="p-8 text-center text-slate-400 text-sm italic">
-                  Awaiting Script & Shot List...
+                  {t.production.awaiting}
                 </div>
               ) : (
                 <table className="w-full text-sm text-left">
                   <thead className="bg-slate-100 text-slate-500 font-medium">
                     <tr>
-                      <th className="p-3 w-32">Shot</th>
-                      <th className="p-3 w-32">Character</th>
-                      <th className="p-3">Dialogue & Action</th>
+                      <th className="p-3 w-32">{t.production.tableShot}</th>
+                      <th className="p-3 w-32">{t.production.tableChar}</th>
+                      <th className="p-3">{t.production.tableDialogue}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -324,7 +343,7 @@ export const ProductionView: React.FC<{
                       <tr key={idx} className={`hover:bg-slate-50 ${line.isGoldenSentence ? 'bg-yellow-50/50' : ''}`}>
                          <td className="p-3 align-top">
                            <span className="inline-block bg-slate-200 text-slate-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase mb-1">
-                             {line.shotType || 'TBD'}
+                             {line.shotType || t.production.tbd}
                            </span>
                          </td>
                          <td className="p-3 align-top font-semibold text-slate-800">
@@ -357,7 +376,7 @@ export const ProductionView: React.FC<{
               onClick={onNext}
               className="bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 flex items-center gap-2 shadow-lg"
             >
-              Next: Viral Check <CheckCircle size={16} />
+              {t.production.next} <CheckCircle size={16} />
             </button>
           </div>
        )}
@@ -370,12 +389,15 @@ export const ViralCheckView: React.FC<{
   analysis: ViralAnalysis | null;
   isLoading: boolean;
   onAnalyze: () => void;
-}> = ({ analysis, isLoading, onAnalyze }) => {
+  language: Language;
+}> = ({ analysis, isLoading, onAnalyze, language }) => {
+  const t = translations[language];
+
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-fade-in mt-10">
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-slate-900 mb-2">Blockbuster Factor Analysis</h2>
-        <p className="text-slate-500">The "Viral Reviewer" agent evaluates potential reach.</p>
+        <h2 className="text-3xl font-bold text-slate-900 mb-2">{t.viral.title}</h2>
+        <p className="text-slate-500">{t.viral.desc}</p>
       </div>
 
       {!analysis ? (
@@ -390,20 +412,20 @@ export const ViralCheckView: React.FC<{
              disabled={isLoading}
              className="bg-red-600 text-white px-8 py-3 rounded-full font-bold hover:bg-red-700 shadow-lg shadow-red-200 transition-transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:scale-100"
            >
-             {isLoading ? 'Running Simulation...' : 'Run Viral Simulation'}
+             {isLoading ? t.viral.running : t.viral.runBtn}
            </button>
            <p className="mt-4 text-xs text-slate-400 max-w-sm mx-auto">
-             Analyzes hooks, emotion peaks, rhythm, and shareability based on platform algorithms.
+             {t.viral.details}
            </p>
          </div>
       ) : (
         <div className="grid md:grid-cols-2 gap-6">
-          <ViralCard label="Hook Strength" value={analysis.hookStrength} score={90} />
-          <ViralCard label="Emotional Peak" value={analysis.emotionPeak} score={85} />
-          <ViralCard label="Rhythm Fit" value={analysis.rhythmFit} score={88} />
-          <ViralCard label="Memory Repeat" value={analysis.memoryRepeat} score={92} />
+          <ViralCard label={t.viral.hookStrength} value={analysis.hookStrength} score={90} />
+          <ViralCard label={t.viral.emotionPeak} value={analysis.emotionPeak} score={85} />
+          <ViralCard label={t.viral.rhythmFit} value={analysis.rhythmFit} score={88} />
+          <ViralCard label={t.viral.memoryRepeat} value={analysis.memoryRepeat} score={92} />
           <div className="md:col-span-2 bg-gradient-to-r from-red-500 to-pink-600 text-white p-6 rounded-xl shadow-lg">
-             <h3 className="font-bold text-lg mb-2 flex items-center gap-2"><Sparkles /> Spread Potential</h3>
+             <h3 className="font-bold text-lg mb-2 flex items-center gap-2"><Sparkles /> {t.viral.spreadPotential}</h3>
              <p className="text-white/90">{analysis.spreadPotential}</p>
           </div>
         </div>

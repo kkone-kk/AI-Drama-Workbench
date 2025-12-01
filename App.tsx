@@ -4,6 +4,8 @@ import { Logger } from './components/Logger';
 import { SetupView, StrategyView, ScenesView, ProductionView, ViralCheckView } from './components/StepViews';
 import { ProjectSettings, Character, Scene, Script, LogEntry, AgentRole, ViralAnalysis } from './types';
 import { generateStrategy, generateScenePlan, generateDialogueAndAction, generateShots, runViralCheck } from './services/geminiService';
+import { Globe } from 'lucide-react';
+import { translations, Language } from './translations';
 
 const initialSettings: ProjectSettings = {
   topic: '',
@@ -14,7 +16,11 @@ const initialSettings: ProjectSettings = {
 };
 
 export default function App() {
-  // State
+  // Language State
+  const [language, setLanguage] = useState<Language>('zh');
+  const t = translations[language];
+
+  // App State
   const [currentStep, setCurrentStep] = useState(0);
   const [settings, setSettings] = useState<ProjectSettings>(initialSettings);
   const [characters, setCharacters] = useState<Character[]>([]);
@@ -25,7 +31,7 @@ export default function App() {
   const [loadingStrategy, setLoadingStrategy] = useState(false);
   const [loadingScenes, setLoadingScenes] = useState(false);
   const [processingProduction, setProcessingProduction] = useState(false);
-  const [productionStatus, setProductionStatus] = useState('');
+  const [productionStatus, setProductionStatus] = useState<{ type: 'processing' | 'complete' | 'idle', id?: number }>({ type: 'idle' });
   const [loadingViral, setLoadingViral] = useState(false);
 
   // Logs
@@ -39,6 +45,10 @@ export default function App() {
       message,
       type
     }]);
+  };
+
+  const toggleLanguage = () => {
+    setLanguage(prev => prev === 'en' ? 'zh' : 'en');
   };
 
   // --- Handlers ---
@@ -77,7 +87,7 @@ export default function App() {
 
     for (let i = 0; i < updatedScenes.length; i++) {
       const scene = updatedScenes[i];
-      setProductionStatus(`Processing Scene ${scene.id}...`);
+      setProductionStatus({ type: 'processing', id: scene.id });
       
       // Step 1: Screenwriter (Dialogue + Action)
       addLog(AgentRole.SCREENWRITER, `Writing dialogue for Scene ${scene.id} (${scene.location})...`, 'info');
@@ -101,7 +111,7 @@ export default function App() {
     }
 
     setProcessingProduction(false);
-    setProductionStatus('Production Complete');
+    setProductionStatus({ type: 'complete' });
   };
 
   const handleViralCheck = async () => {
@@ -123,23 +133,31 @@ export default function App() {
 
   return (
     <div className="flex h-screen bg-slate-50 font-sans overflow-hidden">
-      <Sidebar currentStep={currentStep} setStep={setCurrentStep} />
+      <Sidebar currentStep={currentStep} setStep={setCurrentStep} language={language} />
       
       <main className="flex-1 flex flex-col h-full overflow-hidden relative">
         <header className="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between shrink-0">
-          <h2 className="text-lg font-semibold text-slate-800">
-             {currentStep === 0 && "Project Setup"}
-             {currentStep === 1 && "Strategic Positioning"}
-             {currentStep === 2 && "Scene Architecture"}
-             {currentStep === 3 && "Production & Shot Design"}
-             {currentStep === 4 && "Viral Factor Verification"}
-             {currentStep === 5 && "Final Output"}
-          </h2>
-          {!process.env.API_KEY && (
-             <div className="bg-red-50 text-red-600 px-3 py-1 rounded text-xs font-bold border border-red-200">
-               API_KEY Not Found
-             </div>
-          )}
+          <div className="flex items-center gap-4">
+            <h2 className="text-lg font-semibold text-slate-800">
+               {t.steps[currentStep as keyof typeof t.steps]}
+            </h2>
+          </div>
+          
+          <div className="flex items-center gap-4">
+             <button
+              onClick={toggleLanguage}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-medium transition-colors"
+             >
+               <Globe size={14} />
+               {language === 'zh' ? 'EN' : '中文'}
+             </button>
+
+             {!process.env.API_KEY && (
+               <div className="bg-red-50 text-red-600 px-3 py-1 rounded text-xs font-bold border border-red-200">
+                 {t.common.apiKeyMissing}
+               </div>
+             )}
+          </div>
         </header>
 
         <div className="flex-1 overflow-y-auto p-8">
@@ -150,6 +168,7 @@ export default function App() {
                characters={characters} 
                setCharacters={setCharacters}
                onNext={() => setCurrentStep(1)}
+               language={language}
              />
            )}
            {currentStep === 1 && (
@@ -158,6 +177,7 @@ export default function App() {
                isLoading={loadingStrategy}
                onGenerate={handleGenerateStrategy}
                onNext={() => setCurrentStep(2)}
+               language={language}
              />
            )}
            {currentStep === 2 && (
@@ -166,15 +186,17 @@ export default function App() {
                isLoading={loadingScenes}
                onGenerate={handleGenerateScenes}
                onNext={() => setCurrentStep(3)}
+               language={language}
              />
            )}
            {currentStep === 3 && (
              <ProductionView
                scenes={scenes}
                isProcessing={processingProduction}
-               progress={productionStatus}
+               status={productionStatus}
                onStartProduction={handleProductionLoop}
                onNext={() => setCurrentStep(4)}
+               language={language}
              />
            )}
            {currentStep === 4 && (
@@ -182,11 +204,12 @@ export default function App() {
                analysis={viralAnalysis}
                isLoading={loadingViral}
                onAnalyze={handleViralCheck}
+               language={language}
              />
            )}
            {currentStep === 5 && (
              <div className="max-w-4xl mx-auto space-y-4 animate-fade-in">
-                <h3 className="font-bold text-lg">Final Script JSON</h3>
+                <h3 className="font-bold text-lg">{t.final.jsonTitle}</h3>
                 <pre className="bg-slate-900 text-slate-300 p-6 rounded-xl overflow-auto text-xs font-mono max-h-[600px]">
                   {JSON.stringify({ settings, characters, scenes, viralAnalysis }, null, 2)}
                 </pre>
@@ -195,7 +218,7 @@ export default function App() {
         </div>
       </main>
 
-      <Logger logs={logs} />
+      <Logger logs={logs} language={language} />
     </div>
   );
 }

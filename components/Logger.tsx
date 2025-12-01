@@ -1,9 +1,11 @@
 import React, { useRef, useEffect } from 'react';
 import { LogEntry, AgentRole } from '../types';
 import { Bot, User, Film, Camera, Search, AlertCircle, BarChart2 } from 'lucide-react';
+import { translations, Language } from '../translations';
 
 interface LoggerProps {
   logs: LogEntry[];
+  language: Language;
 }
 
 const getRoleIcon = (role: AgentRole) => {
@@ -17,8 +19,9 @@ const getRoleIcon = (role: AgentRole) => {
   }
 };
 
-export const Logger: React.FC<LoggerProps> = ({ logs }) => {
+export const Logger: React.FC<LoggerProps> = ({ logs, language }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const t = translations[language];
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -31,13 +34,13 @@ export const Logger: React.FC<LoggerProps> = ({ logs }) => {
       <div className="p-4 border-b border-slate-800 bg-slate-900 sticky top-0 z-10">
         <h3 className="font-semibold text-white flex items-center gap-2">
           <Bot size={18} className="text-purple-500" />
-          Agent Collaboration
+          {t.logger.title}
         </h3>
       </div>
       <div className="flex-1 overflow-y-auto p-4 space-y-4" ref={scrollRef}>
         {logs.length === 0 && (
           <div className="text-slate-500 text-center text-sm py-10 italic">
-            Waiting for agents to start...
+            {t.logger.waiting}
           </div>
         )}
         {logs.map((log) => (
