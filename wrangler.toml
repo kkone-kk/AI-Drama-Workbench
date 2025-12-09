@@ -2,9 +2,9 @@ name = "ai-drama-workbench"
 compatibility_date = "2025-12-09"
 
 [assets]
-directory = "./dist"  # 指向Vite构建后的静态资源目录
+directory = "./dist"  # 静态资源目录
 
-# 关键：添加路由规则，确保所有请求都返回index.html（单页应用必需）
+# 单页应用路由配置（修复核心）
 [[routes]]
-pattern = "https://ai-drama.jikehu999.workers.dev/*"  # 替换为你的Worker域名
-destination = "/index.html"
+pattern = "ai-drama.jikehu999.workers.dev/*"  # 移除 https:// 前缀
+navigation_fallback = { bypass_token = "random-token", status = 200, filename = "/index.html" }
