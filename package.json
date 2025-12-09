@@ -10,11 +10,9 @@
   },
   "dependencies": {
     "react": "^19.2.0",
-    "lucide-react": "^0.555.0",
-    "@google/genai": "^1.30.0",
     "react-dom": "^19.2.0",
-    "@cloudflare/kv-asset-handler": "^0.3.0",
-    "itty-router": "^4.0.23"
+    "lucide-react": "^0.555.0",
+    "@google/genai": "^1.30.0"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
