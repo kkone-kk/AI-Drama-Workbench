@@ -2,4 +2,9 @@ name = "ai-drama-workbench"
 compatibility_date = "2025-12-09"
 
 [assets]
-directory = "./dist"
+directory = "./dist"  # 指向Vite构建后的静态资源目录
+
+# 关键：添加路由规则，确保所有请求都返回index.html（单页应用必需）
+[[routes]]
+pattern = "your-worker-subdomain.cloudflareworkers.com/*"  # 替换为你的Worker域名
+destination = "/index.html"
