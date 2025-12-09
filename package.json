@@ -22,7 +22,6 @@
   },
   {
   "dependencies": {
-    // 新增以下依赖
     "@cloudflare/kv-asset-handler": "^0.3.0",
     "itty-router": "^4.0.23"
   }
