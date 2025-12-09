@@ -24,7 +24,7 @@ View your app in AI Studio: https://ai.studio/apps/drive/13GPguDX1CIXfCbsnWDKRXC
 </head>
   <body class="bg-slate-50 text-slate-900">
     <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>#增加这行指明React入口代码
+    <script type="module" src="/index.tsx"></script>#增加这行指明React入口代码#<script type="module" src="/index.tsx"></script>#
   </body>
 </html>
 
