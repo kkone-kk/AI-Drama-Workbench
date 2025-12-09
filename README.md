@@ -36,7 +36,6 @@ View your app in AI Studio: https://ai.studio/apps/drive/13GPguDX1CIXfCbsnWDKRXC
 方案 A：在构建配置中暴露变量（推荐，无需改代码）
 如果您使用 Vite，请在项目根目录的 vite.config.ts 中添加 define 配置，将 Vercel 的环境变量传递给前端：
 code
-TypeScript
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 
@@ -51,5 +50,8 @@ export default defineConfig(({ mode }) => {
     },
   }
 })
+
+
+
 方案 B：修改代码（标准做法）
 将 Vercel 上的变量名改为 VITE_API_KEY，并将代码中的 process.env.API_KEY 修改为 import.meta.env.VITE_API_KEY。
