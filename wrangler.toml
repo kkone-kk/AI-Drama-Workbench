@@ -1,6 +1,0 @@
-name = "ai-drama-workbench"
-compatibility_date = "2025-12-09"
-
-[site]
-bucket = "./dist"  # 静态资源目录（替换原有的 [assets] 配置）
-entry-point = "./workers-site"  # 自动生成的 Workers 入口
